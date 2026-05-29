@@ -7,9 +7,16 @@ class Question {
   }
   shuffleChoices() {
     for (let i = 0; i < this.choices.length; i++) {
-      const j = Math.floor(Math.random() * this.choices.length);
-    [this.choices[i], this.choices[j]] = [this.choices[j], this.choices[i]]
+    const randomIndex = Math.floor(Math.random() * this.choices.length);
+
+    // swap array[i] with array[randomIndex]
+    const temp = this.choices[i];
+    this.choices[i] = this.choices[randomIndex];
+    this.choices[randomIndex] = temp;
+  }
+
+  return this.choices;
     }
   }
-}
+
 
