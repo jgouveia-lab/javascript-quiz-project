@@ -1,6 +1,5 @@
 class Quiz {
-    // YOUR CODE HERE:
-    
+
     constructor (questions, timeLimit, timeRemaining) {
         this.questions = questions;
         this.timeLimit = timeLimit;
@@ -12,31 +11,51 @@ class Quiz {
     getQuestion() {
         return this.questions[this.currentQuestionIndex];
     }
-    
+
     moveToNextQuestion() {
         this.currentQuestionIndex++;
     }
 
     shuffleQuestions() {
         for (let i = 0; i < this.questions.length; i++) {
-        const randomIndex = Math.floor(Math.random() * this.questions.length);
-
-    // swap array[i] with array[randomIndex]
-        const temp = this.questions[i];
-        this.questions[i] = this.questions[randomIndex];
-        this.questions[randomIndex] = temp;
-  }
+            const randomIndex = Math.floor(Math.random() * this.questions.length);
+            const temp = this.questions[i];
+            this.questions[i] = this.questions[randomIndex];
+            this.questions[randomIndex] = temp;
+        }
     }
 
     checkAnswer(answer) {
-        this.correctAnswers++;
+        // get the current question and check if the answer matches
+        const currentQuestion = this.questions[this.currentQuestionIndex];
+        if (currentQuestion.answer === answer) {
+            this.correctAnswers++;
+        }
     }
 
-    hasEnded(){
-        if(this.currentQuestionIndex < this.questions.length) {
+    hasEnded() {
+        if (this.currentQuestionIndex < this.questions.length) {
             return false;
         } else {
             return true;
         }
+    }
+
+    filterQuestionsByDifficulty(difficulty) {
+        // only filter if difficulty is a number between 1 and 3
+        if (typeof difficulty !== "number" || difficulty < 1 || difficulty > 3) {
+            return;
+        }
+        this.questions = this.questions.filter(function(q) {
+            return q.difficulty === difficulty;
+        });
+    }
+
+    averageDifficulty() {
+        let total = 0;
+        for (let i = 0; i < this.questions.length; i++) {
+            total += this.questions[i].difficulty;
+        }
+        return total / this.questions.length;
     }
 }
