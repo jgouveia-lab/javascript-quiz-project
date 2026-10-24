@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // End view elements
   const resultContainer = document.querySelector("#result");
+  const restartButton = document.querySelector("#restartButton");
 
 
   /************  SET VISIBILITY OF VIEWS  ************/
@@ -41,11 +42,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /************  SHOW INITIAL CONTENT  ************/
 
-  const minutes = Math.floor(quiz.timeRemaining / 60).toString().padStart(2, "0");
-  const seconds = (quiz.timeRemaining % 60).toString().padStart(2, "0");
-
   const timeRemainingContainer = document.getElementById("timeRemaining");
-  timeRemainingContainer.innerText = `${minutes}:${seconds}`;
+  let timer;
+
+  showTimeRemaining();
 
   // Show first question
   showQuestion();
@@ -53,31 +53,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /************  TIMER  ************/
 
-  let timer = setInterval(function() {
-    quiz.timeRemaining--;
-
-    const mins = Math.floor(quiz.timeRemaining / 60).toString().padStart(2, "0");
-    const secs = (quiz.timeRemaining % 60).toString().padStart(2, "0");
-    timeRemainingContainer.innerText = `${mins}:${secs}`;
-
-    if (quiz.timeRemaining <= 0) {
-      clearInterval(timer);
-      showResults();
-    }
-  }, 1000);
+  startTimer();
 
 
   /************  EVENT LISTENERS  ************/
 
   nextButton.addEventListener("click", nextButtonHandler);
+  restartButton.addEventListener("click", restartButtonHandler);
 
 
   /************  FUNCTIONS  ************/
 
+  function showTimeRemaining() {
+    const minutes = Math.floor(quiz.timeRemaining / 60).toString().padStart(2, "0");
+    const seconds = (quiz.timeRemaining % 60).toString().padStart(2, "0");
+    timeRemainingContainer.innerText = `${minutes}:${seconds}`;
+  }
+
+
+  function startTimer() {
+    timer = setInterval(function() {
+      quiz.timeRemaining--;
+      showTimeRemaining();
+
+      // When the time is up, end the quiz
+      if (quiz.timeRemaining <= 0) {
+        showResults();
+      }
+    }, 1000);
+  }
+
+
   function showQuestion() {
     // If the quiz has ended, show the results
     if (quiz.hasEnded()) {
-      clearInterval(timer);
       showResults();
       return;
     }
@@ -142,6 +151,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   function showResults() {
+    // Stop the timer
+    clearInterval(timer);
+
     // 1. Hide the quiz view
     quizView.style.display = "none";
 
@@ -150,6 +162,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 3. Show the score
     resultContainer.innerText = `You scored ${quiz.correctAnswers} out of ${quiz.questions.length} correct answers!`;
+  }
+
+
+  function restartButtonHandler() {
+    // 1. Hide the end view
+    endView.style.display = "none";
+
+    // 2. Show the quiz view
+    quizView.style.display = "block";
+
+    // 3. Reset the quiz
+    quiz.currentQuestionIndex = 0;
+    quiz.correctAnswers = 0;
+    quiz.shuffleQuestions();
+    showQuestion();
+
+    // 4. Reset and restart the timer
+    quiz.timeRemaining = quiz.timeLimit;
+    showTimeRemaining();
+    startTimer();
   }
 
 });

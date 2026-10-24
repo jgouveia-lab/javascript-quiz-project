@@ -52,10 +52,9 @@ class Quiz {
     }
 
     averageDifficulty() {
-        let total = 0;
-        for (let i = 0; i < this.questions.length; i++) {
-            total += this.questions[i].difficulty;
-        }
+        const total = this.questions.reduce(function(sum, q) {
+            return sum + q.difficulty;
+        }, 0);
         return total / this.questions.length;
     }
 }
